@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>QuagsLoadscreen</title>
+	<link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet'>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<style type="text/css">
+		body {
+			-webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; 
+			margin: 0;
+			overflow: hidden;
+			font-family: "Oswald";
+		}
+		.container {
+			width: 100vw;
+			height: 100vh;
+		}
+		.sidebar-selector {
+			position: absolute;
+			height: 100vh;
+			right: -50vw;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 50vw;
+			background-color:rgba(25, 25, 25, 1.0);
+			box-shadow: 0 0 0vw black;
+		}
+		.gif {
+			background-image: url("https://i.gifer.com/QACY.gif");
+			background-size: 80vw;
+		}
+		.closeButton-sidebar {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			right: 50vw;
+			height: 8vw;
+			width: 2vw;
+			background-color:rgba(25, 25, 25, 0.9);
+			border-radius: 0.5vw 0 0 0.5vw;
+			transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		}
+
+		.closeButton-sidebar:hover .vert-line {
+			background-color:rgba(255, 255, 255, 0.5);
+			height: 6.7vw;
+		}
+
+		.closeButton-sidebar:hover {
+			height: 7.7vw;
+            cursor: pointer;
+		}
+
+		.vert-line {
+			position: absolute;
+			width: 0.2vw;
+			height: 7vw;
+			top: 50%;
+			transform: translateY(-50%);
+			background-color:rgba(255, 255, 255, 0.8);
+			border-radius: 2vw;
+			transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		}
+
+		@keyframes close-sidebar {
+			from{right: 0vw; box-shadow: 0 0 1vw black;}
+			to{right: -50vw; box-shadow: 0 0 0vw black;}
+		}
+		@keyframes open-sidebar {
+			from{right: -50vw; box-shadow: 0 0 0vw black;}
+			to{right: 0vw; box-shadow: 0 0 1vw black;}
+		}
+		.button-option {
+			position: absolute;
+			left: 0;
+			width: 13vw;
+			height: 4vw;
+			border-radius: 0.5vw;
+			background-color: white;
+			background-image: url("https://static.vecteezy.com/system/resources/thumbnails/001/879/962/small/white-shapes-abstract-background-free-vector.jpg");
+			background-size: cover;
+			font-size: 3.0vw;
+			text-align: center;
+			padding-bottom: 1vw;
+			padding-top: -1vw;
+			font-family: "Oswald";
+			border: 0.2vw solid black;
+			box-shadow: 0 0 1vw black;
+			transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		}
+		.button-option:hover {
+			transform: scale(0.95);
+            cursor: pointer;
+		}
+		.sidebar-bottom {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			width: 50vw;
+			height: 8vw;
+			box-shadow: 0.4vw 0 1vw rgba(100, 100, 100, 1.0);
+			background-image: url("https://s3.envato.com/files/242334881/preview.jpg");
+			background-size: cover;
+			filter: opacity(0.9);
+		}
+		iframe:not(.player) {
+			position: absolute;
+			top: 5vh;
+			width: 45vw;
+			height: 75vh;
+			right: -46vw;
+			border-radius: 0.4vw;
+		}
+		@keyframes close-iframe {
+			from{right: 2.5vw;}
+			to{right: -46vw;}
+		}
+		@keyframes open-iframe {
+			from{right: -46vw;}
+			to{right: 2.5vw;}
+		}
+		.music-selector {
+			position: absolute;
+			width: 16vw;
+			height: 0vw;
+			left: 0.8vw;
+			top: 5vw;
+			background-color: rgba(25, 25, 25, 0.9);
+			border-radius: 0 0 0.5vw 0.5vw;
+			overflow-y: scroll;
+
+		}
+		::-webkit-scrollbar {
+  		width: 0.5vw;
+  		height: 0.5vw;
+		}
+
+		::-webkit-scrollbar-thumb {
+  		background: rgba(200, 200, 200, 0.5);
+  		border-radius: 0.25vw;
+		}
+
+		::-webkit-scrollbar-track {
+  		background: rgba(0, 0, 0, 0.1);
+		}
+		.music-title {
+			position: absolute;
+			font-size: 2.0vw;
+			top: 0.8vw;
+			text-align: left;
+			color: white;
+			left: 0.8vw;
+			background-color: rgba(25, 25, 25, 0.9);
+			border-radius: 0.5vw 0.5vw 0 0;
+			padding: 0.5vw;
+			width: 15vw;
+			height: 3vw;
+		}
+		.dropdown-button {
+			position: absolute;
+			width: 2.0vw;
+			height: 2.0vw;
+			right: 0.5vw;
+			top: 1vw;
+			background-image: url("arrow-l.png");
+			background-size: cover;
+			background-color: rgba(15, 15, 15, 0.9);
+			border-radius: 0.3vw;
+			color: white;
+			padding: auto;
+			font-size: 3.0vw;
+			transition: 0.1s;
+			box-shadow: 0 0 1vw black;
+		}
+		.dropdown-button:active {
+			background-color: rgba(100, 100, 100, 0.9);
+			transform: scale(0.9);
+		}
+		.dropdown-button:hover {
+			filter: brightness(0.9);
+            cursor: pointer;
+		}
+		@keyframes dropdown-menu {
+			from{height: 0vw;}
+			to{height: 25vw;}
+		}
+		@keyframes closedown-menu {
+			from{height: 25vw;}
+			to{height: 0vw;}
+		}
+		.music-title-text {
+			position: absolute;
+			left: 1.0vw;
+			width: 12.5vw;
+			height: 3vw;
+			text-overflow: clip;
+			white-space: nowrap;
+			overflow: hidden;
+		}
+		#music-text {
+			width: max-content;
+			position: absolute;
+			left: 0;
+		}
+		@keyframes moveMusic {
+			0% {left: 0%;}
+			49.99999% {left: var(--move-var);}
+			50% {left: var(--move-var2);}
+			100% {left: 0%}
+		}
+		:root {
+  		--move-var: 0px;
+  		--move-var2: 0px;
+		}
+		.music-title-text:hover #music-text {
+			animation: moveMusic 4s infinite linear;
+            cursor: none;
+		}
+		.song-select-button {
+			font-size: 1.5vw;
+			color: white;
+			margin: 2%;
+			padding: 1%;
+			background-color: rgba(0, 0, 0, 0.9);
+			border-radius: 0.3vw;
+		}
+		.song-select-button:hover {
+			transform: scale(0.98);
+            cursor: pointer;
+		}
+		#QuaggySongs {
+			position: absolute;
+			width: 20vw;
+			height: 3.5vw;
+			left: 40vw;
+			bottom: 10vw;
+			transition: 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.00);
+			filter: invert(0.95);
+		}
+		audio::-webkit-media-controls-current-time-display {
+  			font-size: 1vw;
+		}
+		audio::-webkit-media-controls-time-remaining-display {
+  			font-size: 1vw;
+		}
+		#gu-logo {
+			transition: 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.00);
+		}
+		.triangle1 {
+			position: absolute;
+			width: 200vw;
+			height: 200vh;
+			background: linear-gradient(to bottom left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 100%);
+			top: -100vh;
+		}
+		.triangle2 {
+			position: absolute;
+			width: 150vw;
+			height: 150vh;
+			background: linear-gradient(to bottom left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 100%);
+			top: -50vh;
+		}
+		.triangle3 {
+			position: absolute;
+			width: 150vw;
+			height: 150vh;
+			background: linear-gradient(to bottom left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 100%);
+			top: 0vh;
+		}
+		.triangle4 {
+			position: absolute;
+			width: 150vw;
+			height: 150vh;
+			background: linear-gradient(to bottom left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 100%);
+			top: 50vh;
+		}
+		#stars {
+    width: 0.052083vw;
+    height: 0.052083vw;
+    margin-left: 0;
+    background: transparent;
+    box-shadow: 10.52083vw 1720px #FFF, 1502px 803px #FFF, 2239px 2116px #FFF, 424px 1447px #FFF, 2065px 1413px #FFF, 634px 951px #FFF, 1694px 1868px #FFF, 1041px 1726px #FFF, 936px 811px #FFF, 2491px 12px #FFF, 64px 1049px #FFF, 781px 1496px #FFF, 1983px 2219px #FFF, 214px 185px #FFF, 2374px 2327px #FFF, 527px 571px #FFF, 1182px 1629px #FFF, 414px 1775px #FFF, 581px 282px #FFF, 1733px 1293px #FFF, 407px 113px #FFF, 1399px 1761px #FFF, 1199px 2200px #FFF, 899px 0.78125vw #FFF, 2128px 1033px #FFF, 1918px 1927px #FFF, 2289px 1882px #FFF, 1291px 825px #FFF, 882px 1128px #FFF, 209px 1248px #FFF, 1837px 118px #FFF, 384px 2404px #FFF, 2209px 1755px #FFF, 68px 1821px #FFF, 929px 490px #FFF, 2135px 2181px #FFF, 1998px 906px #FFF, 1932px 1786px #FFF, 959px 1284px #FFF, 2281px 2025px #FFF, 372px 363px #FFF, 2469px 1612px #FFF, 450px 324px #FFF, 1821px 2313px #FFF, 1400px 946px #FFF, 1507px 1521px #FFF, 503px 670px #FFF, 587px 1437px #FFF, 146px 452px #FFF, 926px 349px #FFF, 656px 59px #FFF, 1572px 609px #FFF, 1130px 139px #FFF, 1074px 530px #FFF, 637px 1612px #FFF, 2421px 1446px #FFF, 1630px 400px #FFF, 142px 1122px #FFF, 1892px 1919px #FFF, 851px 1588px #FFF, 2297px 656px #FFF, 1863px 1853px #FFF, 2279px 368px #FFF, 652px 1997px #FFF, 370px 169px #FFF, 1116px 1977px #FFF, 2368px 108px #FFF, 1080px 877px #FFF, 819px 956px #FFF, 2212px 1476px #FFF, 2176px 1.14583vw #FFF, 376px 786px #FFF, 0.2083vw 1212px #FFF, 2464px 2029px #FFF, 1536px 457px #FFF, 513px 1888px #FFF, 409px 331px #FFF, 330px 684px #FFF, 336px 1836px #FFF, 704px 298px #FFF, 0.2083vw 2320px #FFF, 2039px 385px #FFF, 130.52083vw 1008px #FFF, 408px 1872px #FFF, 811px 901px #FFF, 849px 963px #FFF, 2144px 829px #FFF, 1961px 507px #FFF, 731px 566px #FFF, 938px 946px #FFF, 140px 27px #FFF, 829px 1061px #FFF, 1763px 638px #FFF, 1650px 709px #FFF, 743px 1308px #FFF, 932px 2454px #FFF, 293px 2344px #FFF, 1116px 1633px #FFF, 2081px 1061px #FFF, 302px 1182px #FFF, 1269px 381px #FFF, 1403px 585px #FFF, 1272px 713px #FFF, 2058px 635px #FFF, 91px 2312px #FFF, 998px 591px #FFF, 280px 1040px #FFF, 818px 2260px #FFF, 1366px 2311px #FFF, 1038px 1629px #FFF, 671px 797px #FFF, 665px 1275px #FFF, 671px 1619px #FFF, 900px 845px #FFF, 315px 1790px #FFF, 34px 2134px #FFF, 2333px 171px #FFF, 1355px 2161px #FFF, 1452px 35px #FFF, 636px 1244px #FFF, 1979px 283px #FFF, 270px 272px #FFF, 348px 570px #FFF, 1122px 227px #FFF, 1948px 1039px #FFF, 2033px 1349px #FFF, 1656px 984px #FFF, 503px 954px #FFF, 326px 886px #FFF, 1014px 2276px #FFF, 0.260416vw 424px #FFF, 2413px 1184px #FFF, 2454px 1220px #FFF, 1831px 2286px #FFF, 525px 2214px #FFF, 1520px 363px #FFF, 314px 192px #FFF, 2222px 1597px #FFF, 1208px 542px #FFF, 1391px 266px #FFF, 1685px 2448px #FFF, 591px 499px #FFF, 1755px 1285px #FFF, 1455px 1254px #FFF, 2476px 1694px #FFF, 1065px 640px #FFF, 764px 650px #FFF, 397px 416px #FFF, 2441px 69px #FFF, 1861px 2080px #FFF, 2374px 2076px #FFF, 2029px 2049px #FFF, 864px 655px #FFF, 1251px 1883px #FFF, 1074px 351px #FFF, 823px 1735px #FFF, 680px 2449px #FFF, 885px 511px #FFF, 673px 1908px #FFF, 1694px 2070px #FFF, 1592px 329px #FFF, 2198px 657px #FFF, 2335px 829px #FFF, 71px 427px #FFF, 361px 1259px #FFF, 1330px 1767px #FFF, 1729px 275px #FFF, 1438px 2176px #FFF, 1213px 2499px #FFF, 1712px 963px #FFF, 2162px 368px #FFF, 1679px 1747px #FFF, 19px 1324px #FFF, 1063px 1379px #FFF, 1597px 1960px #FFF, 1413px 1067px #FFF, 776px 1896px #FFF, 1111px 68px #FFF, 273px 313px #FFF, 1431px 2044px #FFF, 1625px 868px #FFF, 1568px 2421px #FFF, 2081px 138px #FFF, 1779px 2383px #FFF, 1177px 1269px #FFF, 561px 1636px #FFF, 1288px 1133px #FFF, 602px 2340px #FFF, 2063px 2129px #FFF, 641px 511px #FFF, 733px 2406px #FFF, 2077px 517px #FFF, 1062px 2315px #FFF, 1365px 1112px #FFF, 483px 2302px #FFF, 1398px 554px #FFF, 2466px 1109px #FFF, 2080px 920px #FFF, 696px 2356px #FFF, 611px 1394px #FFF;
+    -webkit-animation: animStar 50s infinite linear;
+    -moz-animation: animStar 50s infinite linear;
+    animation: animStar 50s infinite linear
+}
+
+#stars:after {
+    content: " ";
+    position: absolute;
+    top: 104.16vw;
+    width: 0.052083vw;
+    height: 0.052083vw;
+    background: transparent;
+    box-shadow: 10.52083vw 1720px #FFF, 1502px 803px #FFF, 2239px 2116px #FFF, 424px 1447px #FFF, 2065px 1413px #FFF, 634px 951px #FFF, 1694px 1868px #FFF, 1041px 1726px #FFF, 936px 811px #FFF, 2491px 12px #FFF, 64px 1049px #FFF, 781px 1496px #FFF, 1983px 2219px #FFF, 214px 185px #FFF, 2374px 2327px #FFF, 527px 571px #FFF, 1182px 1629px #FFF, 414px 1775px #FFF, 581px 282px #FFF, 1733px 1293px #FFF, 407px 113px #FFF, 1399px 1761px #FFF, 1199px 2200px #FFF, 899px 0.78125vw #FFF, 2128px 1033px #FFF, 1918px 1927px #FFF, 2289px 1882px #FFF, 1291px 825px #FFF, 882px 1128px #FFF, 209px 1248px #FFF, 1837px 118px #FFF, 384px 2404px #FFF, 2209px 1755px #FFF, 68px 1821px #FFF, 929px 490px #FFF, 2135px 2181px #FFF, 1998px 906px #FFF, 1932px 1786px #FFF, 959px 1284px #FFF, 2281px 2025px #FFF, 372px 363px #FFF, 2469px 1612px #FFF, 450px 324px #FFF, 1821px 2313px #FFF, 1400px 946px #FFF, 1507px 1521px #FFF, 503px 670px #FFF, 587px 1437px #FFF, 146px 452px #FFF, 926px 349px #FFF, 656px 59px #FFF, 1572px 609px #FFF, 1130px 139px #FFF, 1074px 530px #FFF, 637px 1612px #FFF, 2421px 1446px #FFF, 1630px 400px #FFF, 142px 1122px #FFF, 1892px 1919px #FFF, 851px 1588px #FFF, 2297px 656px #FFF, 1863px 1853px #FFF, 2279px 368px #FFF, 652px 1997px #FFF, 370px 169px #FFF, 1116px 1977px #FFF, 2368px 108px #FFF, 1080px 877px #FFF, 819px 956px #FFF, 2212px 1476px #FFF, 2176px 1.14583vw #FFF, 376px 786px #FFF, 0.2083vw 1212px #FFF, 2464px 2029px #FFF, 1536px 457px #FFF, 513px 1888px #FFF, 409px 331px #FFF, 330px 684px #FFF, 336px 1836px #FFF, 704px 298px #FFF, 0.2083vw 2320px #FFF, 2039px 385px #FFF, 130.52083vw 1008px #FFF, 408px 1872px #FFF, 811px 901px #FFF, 849px 963px #FFF, 2144px 829px #FFF, 1961px 507px #FFF, 731px 566px #FFF, 938px 946px #FFF, 140px 27px #FFF, 829px 1061px #FFF, 1763px 638px #FFF, 1650px 709px #FFF, 743px 1308px #FFF, 932px 2454px #FFF, 293px 2344px #FFF, 1116px 1633px #FFF, 2081px 1061px #FFF, 302px 1182px #FFF, 1269px 381px #FFF, 1403px 585px #FFF, 1272px 713px #FFF, 2058px 635px #FFF, 91px 2312px #FFF, 998px 591px #FFF, 280px 1040px #FFF, 818px 2260px #FFF, 1366px 2311px #FFF, 1038px 1629px #FFF, 671px 797px #FFF, 665px 1275px #FFF, 671px 1619px #FFF, 900px 845px #FFF, 315px 1790px #FFF, 34px 2134px #FFF, 2333px 171px #FFF, 1355px 2161px #FFF, 1452px 35px #FFF, 636px 1244px #FFF, 1979px 283px #FFF, 270px 272px #FFF, 348px 570px #FFF, 1122px 227px #FFF, 1948px 1039px #FFF, 2033px 1349px #FFF, 1656px 984px #FFF, 503px 954px #FFF, 326px 886px #FFF, 1014px 2276px #FFF, 0.260416vw 424px #FFF, 2413px 1184px #FFF, 2454px 1220px #FFF, 1831px 2286px #FFF, 525px 2214px #FFF, 1520px 363px #FFF, 314px 192px #FFF, 2222px 1597px #FFF, 1208px 542px #FFF, 1391px 266px #FFF, 1685px 2448px #FFF, 591px 499px #FFF, 1755px 1285px #FFF, 1455px 1254px #FFF, 2476px 1694px #FFF, 1065px 640px #FFF, 764px 650px #FFF, 397px 416px #FFF, 2441px 69px #FFF, 1861px 2080px #FFF, 2374px 2076px #FFF, 2029px 2049px #FFF, 864px 655px #FFF, 1251px 1883px #FFF, 1074px 351px #FFF, 823px 1735px #FFF, 680px 2449px #FFF, 885px 511px #FFF, 673px 1908px #FFF, 1694px 2070px #FFF, 1592px 329px #FFF, 2198px 657px #FFF, 2335px 829px #FFF, 71px 427px #FFF, 361px 1259px #FFF, 1330px 1767px #FFF, 1729px 275px #FFF, 1438px 2176px #FFF, 1213px 2499px #FFF, 1712px 963px #FFF, 2162px 368px #FFF, 1679px 1747px #FFF, 19px 1324px #FFF, 1063px 1379px #FFF, 1597px 1960px #FFF, 1413px 1067px #FFF, 776px 1896px #FFF, 1111px 68px #FFF, 273px 313px #FFF, 1431px 2044px #FFF, 1625px 868px #FFF, 1568px 2421px #FFF, 2081px 138px #FFF, 1779px 2383px #FFF, 1177px 1269px #FFF, 561px 1636px #FFF, 1288px 1133px #FFF, 602px 2340px #FFF, 2063px 2129px #FFF, 641px 511px #FFF, 733px 2406px #FFF, 2077px 517px #FFF, 1062px 2315px #FFF, 1365px 1112px #FFF, 483px 2302px #FFF, 1398px 554px #FFF, 2466px 1109px #FFF, 2080px 920px #FFF, 696px 2356px #FFF, 611px 1394px #FFF
+}
+
+#stars2 {
+    width: 0.10416vw;
+    height: 0.10416vw;
+    margin-left: 0;
+    background: transparent;
+    box-shadow: 547px 356px #FFF, 150.52083vw 1850px #FFF, 62px 57px #FFF, 1161px 593px #FFF, 950px 147px #FFF, 1925px 2384px #FFF, 927px 1265px #FFF, 748px 2020px #FFF, 1117px 1000px #FFF, 2300px 2430px #FFF, 1949px 917px #FFF, 299px 240px #FFF, 906px 1387px #FFF, 2072px 1467px #FFF, 977px 680px #FFF, 1974px 1424px #FFF, 881px 1744px #FFF, 2149px 775px #FFF, 1520px 596px #FFF, 231px 1369px #FFF, 1162px 508px #FFF, 977px 2473px #FFF, 339px 1440px #FFF, 996px 1078px #FFF, 1005px 1504px #FFF, 1870px 1043px #FFF, 1348px 2408px #FFF, 294px 2347px #FFF, 488px 1718px #FFF, 1922px 1556px #FFF, 2350px 26px #FFF, 2160px 1494px #FFF, 1495px 1762px #FFF, 631px 177px #FFF, 716px 922px #FFF, 279px 2174px #FFF, 1530px 703px #FFF, 2024px 1143px #FFF, 1394px 39px #FFF, 615px 1533px #FFF, 2026px 1039px #FFF, 2311px 2358px #FFF, 504px 2348px #FFF, 1726px 2196px #FFF, 627px 88px #FFF, 392px 405px #FFF, 855px 39px #FFF, 2455px 550px #FFF, 1722px 2194px #FFF, 227px 866px #FFF, 1972px 1715px #FFF, 1492px 658px #FFF, 1709px 2207px #FFF, 1190px 306px #FFF, 2235px 289px #FFF, 2324px 2076px #FFF, 978px 386px #FFF, 1723px 728px #FFF, 273px 824px #FFF, 539px 2208px #FFF, 1899px 906px #FFF, 101px 429px #FFF, 1935px 2224px #FFF, 2474px 367px #FFF, 1448px 13px #FFF, 651px 2172px #FFF, 2317px 1631px #FFF, 1818px 514px #FFF, 1560px 1209px #FFF, 1551px 2100px #FFF, 2150px 2451px #FFF, 1432px 1664px #FFF, 1479px 470px #FFF, 587px 639px #FFF, 801px 1740px #FFF, 1526px 853px #FFF, 2146px 2345px #FFF, 1725px 587px #FFF, 118px 1082px #FFF, 2226px 2141px #FFF, 500px 1465px #FFF, 2275px 1227px #FFF, 643px 1681px #FFF, 765px 1231px #FFF, 2319px 817px #FFF, 2152px 935px #FFF, 683px 165px #FFF, 643px 818px #FFF, 1856px 1657px #FFF, 2207px 1404px #FFF, 36px 2388px #FFF, 724px 255px #FFF, 385px 558px #FFF, 274px 1.302083vw #FFF, 1339px 1783px #FFF, 1629px 1123px #FFF, 1681px 1130px #FFF, 1926px 349px #FFF, 2183px 2405px #FFF, 1976px 1426px #FFF;
+    -webkit-animation: animStar 100s infinite linear;
+    -moz-animation: animStar 100s infinite linear;
+    animation: animStar 100s infinite linear
+}
+
+#stars2:after {
+    content: " ";
+    position: absolute;
+    top: 104.16vw;
+    width: 0.10416vw;
+    height: 0.10416vw;
+    background: transparent;
+    box-shadow: 547px 356px #FFF, 150.52083vw 1850px #FFF, 62px 57px #FFF, 1161px 593px #FFF, 950px 147px #FFF, 1925px 2384px #FFF, 927px 1265px #FFF, 748px 2020px #FFF, 1117px 1000px #FFF, 2300px 2430px #FFF, 1949px 917px #FFF, 299px 240px #FFF, 906px 1387px #FFF, 2072px 1467px #FFF, 977px 680px #FFF, 1974px 1424px #FFF, 881px 1744px #FFF, 2149px 775px #FFF, 1520px 596px #FFF, 231px 1369px #FFF, 1162px 508px #FFF, 977px 2473px #FFF, 339px 1440px #FFF, 996px 1078px #FFF, 1005px 1504px #FFF, 1870px 1043px #FFF, 1348px 2408px #FFF, 294px 2347px #FFF, 488px 1718px #FFF, 1922px 1556px #FFF, 2350px 26px #FFF, 2160px 1494px #FFF, 1495px 1762px #FFF, 631px 177px #FFF, 716px 922px #FFF, 279px 2174px #FFF, 1530px 703px #FFF, 2024px 1143px #FFF, 1394px 39px #FFF, 615px 1533px #FFF, 2026px 1039px #FFF, 2311px 2358px #FFF, 504px 2348px #FFF, 1726px 2196px #FFF, 627px 88px #FFF, 392px 405px #FFF, 855px 39px #FFF, 2455px 550px #FFF, 1722px 2194px #FFF, 227px 866px #FFF, 1972px 1715px #FFF, 1492px 658px #FFF, 1709px 2207px #FFF, 1190px 306px #FFF, 2235px 289px #FFF, 2324px 2076px #FFF, 978px 386px #FFF, 1723px 728px #FFF, 273px 824px #FFF, 539px 2208px #FFF, 1899px 906px #FFF, 101px 429px #FFF, 1935px 2224px #FFF, 2474px 367px #FFF, 1448px 13px #FFF, 651px 2172px #FFF, 2317px 1631px #FFF, 1818px 514px #FFF, 1560px 1209px #FFF, 1551px 2100px #FFF, 2150px 2451px #FFF, 1432px 1664px #FFF, 1479px 470px #FFF, 587px 639px #FFF, 801px 1740px #FFF, 1526px 853px #FFF, 2146px 2345px #FFF, 1725px 587px #FFF, 118px 1082px #FFF, 2226px 2141px #FFF, 500px 1465px #FFF, 2275px 1227px #FFF, 643px 1681px #FFF, 765px 1231px #FFF, 2319px 817px #FFF, 2152px 935px #FFF, 683px 165px #FFF, 643px 818px #FFF, 1856px 1657px #FFF, 2207px 1404px #FFF, 36px 2388px #FFF, 724px 255px #FFF, 385px 558px #FFF, 274px 1.302083vw #FFF, 1339px 1783px #FFF, 1629px 1123px #FFF, 1681px 1130px #FFF, 1926px 349px #FFF, 2183px 2405px #FFF, 1976px 1426px #FFF
+}
+
+#stars3 {
+    width: 3px;
+    height: 3px;
+    margin-left: 0;
+    background: transparent;
+    box-shadow: 2114px 1192px #FFF, 47px 612px #FFF, 708px 498px #FFF, 2341px 658px #FFF, 444px 1180px #FFF, 1645px 302px #FFF, 1335px 2261px #FFF, 1967px 485px #FFF, 1582px 1103px #FFF, 940px 2098px #FFF, 1869px 74px #FFF, 1465px 1905px #FFF, 613px 1777px #FFF, 369px 2059px #FFF, 1898px 903px #FFF, 1475px 797px #FFF, 2136px 703px #FFF, 1832px 1690px #FFF, 1462px 1395px #FFF, 2052px 191px #FFF, 2395px 1350px #FFF, 696px 1522px #FFF, 1440px 1311px #FFF, 1798px 317px #FFF, 2389px 71px #FFF, 641px 2002px #FFF, 1695px 2473px #FFF, 1425px 2218px #FFF, 497px 2105px #FFF, 1406px 1913px #FFF, 847px 1699px #FFF, 2322px 1476px #FFF, 486px 102px #FFF, 1468px 330px #FFF, 673px 936px #FFF, 1634px 630px #FFF, 975px 1741px #FFF, 1747px 800px #FFF, 127px 1551px #FFF, 1063px 1226px #FFF, 1637px 1419px #FFF, 2108px 600px #FFF, 608px 52px #FFF, 816px 856px #FFF, 688px 2105px #FFF, 2085px 1765px #FFF, 702px 1967px #FFF, 669px 1817px #FFF, 210.52083vw 143px #FFF, 452px 90.52083vw #FFF;
+    -webkit-animation: animStar 150s infinite linear;
+    -moz-animation: animStar 150s infinite linear;
+    animation: animStar 150s infinite linear
+}
+
+#stars3:after {
+    content: " ";
+    position: absolute;
+    top: 104.16vw;
+    width: 3px;
+    height: 3px;
+    background: transparent;
+    box-shadow: 2114px 1192px #FFF, 47px 612px #FFF, 708px 498px #FFF, 2341px 658px #FFF, 444px 1180px #FFF, 1645px 302px #FFF, 1335px 2261px #FFF, 1967px 485px #FFF, 1582px 1103px #FFF, 940px 2098px #FFF, 1869px 74px #FFF, 1465px 1905px #FFF, 613px 1777px #FFF, 369px 2059px #FFF, 1898px 903px #FFF, 1475px 797px #FFF, 2136px 703px #FFF, 1832px 1690px #FFF, 1462px 1395px #FFF, 2052px 191px #FFF, 2395px 1350px #FFF, 696px 1522px #FFF, 1440px 1311px #FFF, 1798px 317px #FFF, 2389px 71px #FFF, 641px 2002px #FFF, 1695px 2473px #FFF, 1425px 2218px #FFF, 497px 2105px #FFF, 1406px 1913px #FFF, 847px 1699px #FFF, 2322px 1476px #FFF, 486px 102px #FFF, 1468px 330px #FFF, 673px 936px #FFF, 1634px 630px #FFF, 975px 1741px #FFF, 1747px 800px #FFF, 127px 1551px #FFF, 1063px 1226px #FFF, 1637px 1419px #FFF, 2108px 600px #FFF, 608px 52px #FFF, 816px 856px #FFF, 688px 2105px #FFF, 2085px 1765px #FFF, 702px 1967px #FFF, 669px 1817px #FFF, 210.52083vw 143px #FFF, 452px 90.52083vw #FFF
+}
+
+@-webkit-keyframes animStar {
+    from {
+        -webkit-transform: translateY(0px)
+    }
+
+    to {
+        -webkit-transform: translateY(-2000px)
+    }
+}
+
+@-moz-keyframes animStar {
+    from {
+        -moz-transform: translateY(0px)
+    }
+
+    to {
+        -moz-transform: translateY(-2000px)
+    }
+}
+
+@keyframes animStar {
+    from {
+        -webkit-transform: translateY(0px);
+        -moz-transform: translateY(0px);
+        -ms-transform: translateY(0px);
+        -o-transform: translateY(0px);
+        transform: translateY(0px)
+    }
+
+    to {
+        -webkit-transform: translateY(-2000px);
+        -moz-transform: translateY(-2000px);
+        -ms-transform: translateY(-2000px);
+        -o-transform: translateY(-2000px);
+        transform: translateY(-2000px)
+    }
+}
+@keyframes fadeInContainer {
+	0% {filter: opacity(0.0);}
+	100% {filter: opacity(1.0);}
+}
+@keyframes fadeoutContainer {
+	0% {filter: opacity(1.0);}
+	100% {filter: opacity(0.0);}
+}
+.player {
+	position: absolute;
+	 left: -7.5vw;
+	  top: -7.5vh;
+	   width:115vw;
+	    height:115vh;
+	     display: none;
+}
+@keyframes fadeOutStuff {
+	0% {filter: opacity(1.0);}
+	100% {filter: opacity(0.0);}
+}
+@keyframes moveVolume {
+	0% {
+	left: 40vw;
+	bottom: 10vw;
+	}
+	100% {
+	left: 1vw;
+	bottom: 1vw;
+    }
+}
+</style>
+<script src="https://www.youtube.com/player_api"></script>
+</head>
+<body style="overflow: hidden; cursor:none;">
+	<div id="everything">
+	<iframe class="player" id="player" allowfullscreen
+src="https://www.youtube.com/embed/videoseries?list=PLVHOaswJBoVJn2WD6QdEIM66zfoEf7T7A&autoplay=1&mute=1&enablejsapi=1&rel=0&version=3&playerapiid=ytplayer">
+</iframe>
+	<div style="filter: opacity(0.0);" id="cont" class="container">
+		<div id="triangleMan1" class="triangle1"></div>
+		<div id="triangleMan2" class="triangle2"></div>
+		<div id="triangleMan3" class="triangle3"></div>
+		<div id="triangleMan4" class="triangle4"></div>
+		<div id='stars'></div>
+        <div id='stars2'></div>
+        <div id='stars3'></div>
+
+		<div class="sidebar-selector" id="sidebar" data-status="closed">
+			<div class="gif" style="width: 100vw; height: 100vh; background-color: black;"></div>
+			<div class="closeButton-sidebar" onclick="toggleSidebar()">
+				<div class="vert-line" style="position: absolute; left: 1.3vw;"></div>
+				<div class="vert-line" style="position: absolute; left: 0.9vw;"></div>
+				<div class="vert-line" style="position: absolute; left: 0.5vw;"></div>
+			</div>
+			<div class="sidebar-bottom"></div>
+			<div class="button-option" style="position: absolute; bottom: 1vw; left: 2.45vw;" onclick="toggleIframe('about.html')">About</div>
+			<div class="button-option" style="position: absolute; bottom: 1vw; left: 18.3vw;" onclick="window.invokeNative('openUrl', 'https://docs.google.com/document/d/1-IH08NUrwCR6p-w-KyoQlGkV84t8hDVu53RY7RnHD5A/edit?usp=sharing')">Rules</div>
+			<div class="button-option" style="position: absolute; bottom: 1vw; left: 34.15vw;" onclick="toggleIframe('links.html')">Links</div>
+			<iframe src="" title="hidden"></iframe>
+		</div>
+		<div class="music-title"><div class="music-title-text" onmouseover="moveMusicTitle()"><div id="music-text" data-animation="yep">Choose a Song</div></div><div class="dropdown-button" id="dropdown" onclick="dropSongs();" data-dropdown="closed"></div></div>
+		<div id="mSelect" class="music-selector"></div>
+		<audio controls id="QuaggySongs" onended="playRandomSong();" controlsList="nodownload noplaybackrate">
+  			<source id="QuagSongth" src="" type="audio/mpeg" data-source="">
+		</audio>
+		<img id="gu-logo" style="position: absolute; left: 42.5vw; bottom: 20.625vw; width: 15vw; height:auto;" src="gu.gif">
+	<div id="dummy"></div>
+	</div>
+	</div>
+</body>
+<script type="text/javascript">
+	window.addEventListener('message', (e) => {
+	  if (e.data.info == "select") {
+	    characterMode()
+	  } else if (e.data.info == "fade") {
+	  	fadeoutContainer()
+	  } else if (e.data.volume) {
+	  	document.getElementById("QuaggySongs").volume = e.data.volume;
+	  }
+	})
+</script>
+<script type="text/javascript">
+	var config = [
+	{"N": "Breaking Benjamin - I Will Not Bow", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_i-will-not-bow-youtubemp3free.org.mp3"},
+	{"N": "Breaking Benjamin - The Diary Of Jane", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_the-diary-of-jane-youtubemp3free.org.mp3"},
+	{"N": "JACKBOYS - GATTI", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_gatti-youtubemp3free.org.mp3"},
+	{"N": "Pop Smoke - The Woo", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_the-woo-youtubemp3free.org.mp3"},
+	{"N": "SOiL - Halo", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_halo-youtubemp3free.org.mp3"},
+	{"N": "Slipknot - Wait and Bleed", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_wait-and-bleed-youtubemp3free.org.mp3"},
+	{"N": "Seether - Nobody Praying For Me", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_nobody-praying-for-me-youtubemp3free.org.mp3"},
+	{"N": "Seether - Fine Again", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_fine-again-youtubemp3free.org.mp3"},
+	{"N": "Nirvana - Lithium", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_nirvana-lithium-youtubemp3free.org.mp3"},
+	{"N": "Nirvana - In Bloom", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_in-bloom-youtubemp3free.org.mp3"},
+	{"N": "Nirvana - Drain You", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_drain-you-youtubemp3free.org.mp3"},
+	{"N": "Metallica - I Disappear", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_i-disappear-youtubemp3free.org.mp3"},
+	{"N": "Metallica - Fuel", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_fuel-youtubemp3free.org.mp3"},
+	{"N": "Linkin Park - What I've Done", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_what-ive-done-youtubemp3free.org.mp3"},
+	{"N": "Linkin Park - One Step Closer", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_one-step-closer-youtubemp3free.org.mp3"},
+	{"N": "Linkin Park - Faint", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_faint-youtubemp3free.org.mp3"},
+	{"N": "Linkin Park - Don't Stay", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_dont-stay-youtubemp3free.org.mp3"},
+	{"N": "Korn - Y'all Want A Single", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_yall-want-a-single-youtubemp3free.org.mp3"},
+	{"N": "Korn - Somebody Someone", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_somebody-someone-youtubemp3free.org.mp3"},
+	{"N": "Five Finger Death Punch - Wash It All Away", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_wash-it-all-away-youtubemp3free.org.mp3"},
+	{"N": "Five Finger Death Punch - The Pride", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_the-pride-youtubemp3free.org.mp3"},
+	{"N": "Buckcherry - Lit Up", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_lit-up-youtubemp3free.org.mp3"},
+	{"N": "Nonpoint - Alive and Kicking", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_alive-and-kicking-youtubemp3free.org.mp3"},
+	{"N": "Green Day - American Idiot", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_american-idiot-youtubemp3free.org.mp3"},
+	{"N": "Coal Chamber - Big Truck", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_big-truck-youtubemp3free.org.mp3"},
+	{"N": "Sevendust - Black", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_black-youtubemp3free.org.mp3"},
+	{"N": "Nonpoint - Bullet With a Name", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_bullet-with-a-name-youtubemp3free.org.mp3"},
+	{"N": "Red Hot Chilli Peppers - Can't Stop", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_cant-stop-youtubemp3free.org.mp3"},
+	{"N": "Deftones - Change", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_change-in-the-house-of-flies-youtubemp3free.org.mp3"},
+	{"N": "Crossfade - Cold", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_cold-youtubemp3free.org.mp3"},
+	{"N": "Saosin - Collapse", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_collapse-youtubemp3free.org.mp3"},
+	{"N": "Crossfade - Colors", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_colors-youtubemp3free.org.mp3"},
+	{"N": "Dope - Debonaire", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_debonaire-youtubemp3free.org.mp3"},
+	{"N": "Dope - Die MF Die", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_die-mf-die-youtubemp3free.org.mp3"},
+	{"N": "Disturbed - Down With The Sickness", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_down-with-the-sickness-youtubemp3free.org.mp3"},
+	{"N": "Sevendust - Face To Face", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_face-to-face-youtubemp3free.org.mp3"},
+	{"N": "Candlebox - Far Behind", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_far-behind-youtubemp3free.org.mp3"},
+	{"N": "Papa Roach - Forever", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_forever-youtubemp3free.org.mp3"},
+	{"N": "Creedence Clearwater Revival - Fortunate Son", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_fortunate-son-youtubemp3free.org.mp3"},
+	{"N": "Adema - Giving In", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_giving-in-youtubemp3free.org.mp3"},
+	{"N": "HELLYEAH - I Don't Care Anymore", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_i-dont-care-anymore-youtubemp3free.org.mp3"},
+	{"N": "Coal Chamber - Loco", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_loco-youtubemp3free.org.mp3"},
+	{"N": "HELLYEAH - Moth", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_moth-explicit-youtubemp3free.org.mp3"},
+	{"N": "Creed - One Last Breath", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_one-last-breath-youtubemp3free.org.mp3"},
+	{"N": "The Used - Pretty Handsome Awkward", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_pretty-handsome-awkward-youtubemp3free.org.mp3"},
+	{"N": "Damageplan - Save Me", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_save-me-youtubemp3free.org.mp3"},
+	{"N": "Disturbed - Stricken", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_stricken-youtubemp3free.org.mp3"},
+	{"N": "The Used - The Ripper", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_the-ripper-youtubemp3free.org.mp3"},
+	{"N": "HELLYEAH - Welcome Home", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_welcome-home-youtubemp3free.org.mp3"},
+	{"N": "Nonpoint - What a Day", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_what-a-day-youtubemp3free.org.mp3"},
+	{"N": "HELLYEAH - You Wouldn't Know", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_you-wouldnt-know-youtubemp3free.org.mp3"},
+	{"N": "Buckcherry - Hellbound", "L":"https://archive.org/download/diary-of-jane/ytmp3free.cc_hellbound-youtubemp3free.org.mp3"}
+	]
+	function getRandomInt(max) {
+  		return Math.floor(Math.random() * max);
+	}
+	window.onload = function() {
+		document.getElementById("QuaggySongs").volume = 0.05;
+		musicSelect = document.getElementById("mSelect")
+		config = config.sort(function(a, b){
+		   			if(a["N"] < b["N"]) { return -1; }
+		    		if(a["N"] > b["N"]) { return 1; }
+		    		return 0;
+				})
+		for (var i = 0; i < config.length; i++) {
+			song = document.createElement("div");
+			song.innerHTML = config[i]["N"];
+			song.className = "song-select-button";
+			song.setAttribute("data-songsource", config[i]["L"]);
+			song.onclick = function() { playSong(this) };
+			musicSelect.appendChild(song);
+		}
+		playRandomSong();
+	};
+	function playRandomSong() {
+		playSong(document.getElementsByClassName("song-select-button")[getRandomInt(document.getElementsByClassName("song-select-button").length)]);
+	}
+	function playSong(source) {
+		if (document.getElementById("QuagSongth").getAttribute("data-source") === source.getAttribute("data-songsource")) {
+			playRandomSong()
+		} else {
+		document.getElementById("QuagSongth").src = source.getAttribute("data-songsource");
+		document.getElementById("QuagSongth").setAttribute("data-source", source.getAttribute("data-songsource"));
+		document.getElementById("music-text").innerHTML = source.innerHTML;
+		document.getElementById("QuaggySongs").load();
+		document.getElementById("QuaggySongs").play();
+		}
+	}
+	function moveMusicTitle() {
+		document.documentElement.style.setProperty('--move-time', document.getElementById("music-text").innerHTML.length/6 + "s");
+		if (document.getElementById("music-text").innerHTML.length > 13) {
+			document.documentElement.style.setProperty('--move-var', String(-document.getElementById("music-text").offsetWidth) + "px");
+			document.documentElement.style.setProperty('--move-var2', String(document.getElementById("music-text").offsetWidth) + "px");
+		}
+	}
+	function dropSongs() {
+		if(document.getElementById("dropdown").getAttribute("data-dropdown") === "closed") {
+		document.getElementById('dropdown').style.backgroundImage = 'url("arrow-d.png"';
+		document.getElementById("dropdown").setAttribute("data-dropdown", "open");
+		document.getElementById('mSelect').style.animation = "dropdown-menu 1.0s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+		document.getElementById('mSelect').style.height = '25vw';
+		} else {
+		document.getElementById('dropdown').style.backgroundImage = 'url("arrow-l.png")';
+		document.getElementById("dropdown").setAttribute("data-dropdown", "closed");
+		document.getElementById('mSelect').style.animation = "closedown-menu 1.0s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+		document.getElementById('mSelect').style.height = '0vw';
+		}
+	}
+	function toggleSidebar() {
+		if(document.getElementById("sidebar").getAttribute("data-status") === "closed") {
+		document.getElementById("sidebar").style.animation = "open-sidebar 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+		document.getElementById("sidebar").style.right = "0vw";
+		document.getElementById("sidebar").style.boxShadow = '0 0 1vw black';
+		document.getElementById("sidebar").setAttribute("data-status", "open");
+		document.getElementById("QuaggySongs").style.left = "15vw";
+		document.getElementById("gu-logo").style.transform = "scale(0.8)";
+		document.getElementById("gu-logo").style.left = "36.7vw";
+		document.getElementById("gu-logo").style.bottom = "44.7vw";
+		} else {
+		document.getElementById("sidebar").style.animation = "close-sidebar 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+		document.getElementById("sidebar").style.right = "-50vw";
+		document.getElementById("sidebar").style.boxShadow = '0 0 0vw black';
+		document.getElementById("sidebar").setAttribute("data-status", "closed");
+		document.getElementById("QuaggySongs").style.left = "40vw";
+		document.getElementById("gu-logo").style.transform = "scale(1.0)";
+		document.getElementById("gu-logo").style.left = "42.5vw";
+		document.getElementById("gu-logo").style.bottom = "20.625vw";
+		}
+	}
+	function toggleIframe(source) {
+		if (document.getElementsByTagName("iframe")[1].title === source) {
+			document.getElementsByTagName("iframe")[1].title = "hidden";
+			document.getElementsByTagName("iframe")[1].style.animation = "close-iframe 1.0s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+			document.getElementsByTagName("iframe")[1].style.right = "-46vw";
+		} else if (document.getElementsByTagName("iframe")[1].title == "hidden") {
+			document.getElementsByTagName("iframe")[1].src = source;
+			document.getElementsByTagName("iframe")[1].title = source;
+			document.getElementsByTagName("iframe")[1].style.animation = "open-iframe 1.0s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+			document.getElementsByTagName("iframe")[1].style.right = "2.5vw";
+		} else {
+			document.getElementsByTagName("iframe")[1].title = "hidden";
+			document.getElementsByTagName("iframe")[1].style.animation = "close-iframe 1.0s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+			document.getElementsByTagName("iframe")[1].style.right = "-46vw";
+			delay(500).then(() => reopeniFrame(source));
+		}
+	}
+	function delay(time) {
+  	return new Promise(resolve => setTimeout(resolve, time));
+	}
+	function reopeniFrame(biggychez) {
+		document.getElementsByTagName("iframe")[1].src = biggychez;
+		document.getElementsByTagName("iframe")[1].title = biggychez;
+		document.getElementsByTagName("iframe")[1].style.animation = "open-iframe 1.0s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+		document.getElementsByTagName("iframe")[1].style.right = "2.5vw";
+	}
+	function onYouTubeIframeAPIReady() {
+    var player = new YT.Player('player', 
+    	{
+        events: 
+            {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+            }
+       	}
+            				   )					
+     }    
+
+	function onPlayerReady(event) {
+  	var getDur = event.target.getCurrentTime();
+  	}
+ 	function onPlayerStateChange(event) {
+        if (event.data == 1) {
+		document.getElementById("player").style.display = "block";
+		delay(3100).then(() => fadeinContainer());
+        }
+    }
+    function fadeinContainer() {
+    	document.getElementById("cont").style.animation = "fadeInContainer 1.0s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("cont").style.filter = "opacity(1.0)";
+        document.getElementById("cont").style.cursor = "default";
+    }
+    function fadeoutContainer() {
+    	document.getElementById("cont").style.filter = "opacity(0.0)";
+    	document.getElementById("QuaggySongs").volume = 0;
+    }
+    function characterMode() {
+    	document.getElementById("player").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("triangleMan1").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("triangleMan2").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("triangleMan3").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("triangleMan4").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("stars").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("stars2").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("stars3").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("sidebar").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("gu-logo").style.animation = "fadeOutStuff 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	
+    	document.getElementById("QuaggySongs").style.animation = "moveVolume 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.00)";
+    	document.getElementById("QuaggySongs").style = "left: 1vw; bottom: 1vw;";
+
+
+    	document.getElementById("player").style.filter = "opacity(0.0)";
+    	document.getElementById("triangleMan1").style.filter = "opacity(0.0)";
+    	document.getElementById("triangleMan2").style.filter = "opacity(0.0)";
+    	document.getElementById("triangleMan3").style.filter = "opacity(0.0)";
+    	document.getElementById("triangleMan4").style.filter = "opacity(0.0)";
+    	document.getElementById("stars").style.filter = "opacity(0.0)";
+    	document.getElementById("stars2").style.filter = "opacity(0.0)";
+    	document.getElementById("stars3").style.filter = "opacity(0.0)";
+    	document.getElementById("sidebar").style.filter = "opacity(0.0)";
+    	document.getElementById("gu-logo").style.filter = "opacity(0.0)";
+    	document.getElementById("QuaggySongs").volume = document.getElementById("QuaggySongs").volume * 0.4;
+    }
+    document.getElementById("dummy").addEventListener('animationend', () => {
+    	document.getElementById("everything").style.display = "none";
+    });
+    function round(num, places) {
+    	var multiplier = Math.pow(10, places);
+    	return Math.round(num * multiplier) / multiplier;
+	}
+	document.getElementById("triangleMan1").addEventListener('animationend', () => {
+  		document.getElementById("player").style.display = "none";
+    	document.getElementById("triangleMan1").style.display = "none";
+    	document.getElementById("triangleMan2").style.display = "none";
+    	document.getElementById("triangleMan3").style.display = "none";
+    	document.getElementById("triangleMan4").style.display = "none";
+    	document.getElementById("stars").style.display = "none";
+    	document.getElementById("stars2").style.display = "none";
+    	document.getElementById("stars3").style.display = "none";
+    	document.getElementById("sidebar").style.display = "none";
+    	document.getElementById("gu-logo").style.display = "none";
+    	$.post('https://loadscreen/GU-Loading:syncLoadscreen', JSON.stringify({
+                time: document.getElementById("QuaggySongs").currentTime,
+                vol: document.getElementById("QuaggySongs").volume,
+                song: document.getElementById("QuagSongth").src,
+                text: document.getElementById("music-text").innerHTML
+            }))
+	});
+</script>
+</html>
